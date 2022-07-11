@@ -32,7 +32,14 @@ const marketList=[
 // marketRouter.get('',function(request,response){
 // response.send(marketList);}
 // );
-
+marketRouter.use((request,response,next)=>{
+    if(request.session.user){
+      next();
+    }
+    else{
+      response.send(401);
+    }
+    });
 marketRouter.get('/:item',function(request,response){
 const item = request.params.item;
 const maketItem= marketList.find((i)=>i.store===item);

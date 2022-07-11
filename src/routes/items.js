@@ -15,8 +15,8 @@ const ListItems = [
 ];
 router.get('',function(req, ress, ) { 
   
-    ress.cookie('visted',true,{
-        maxAge:60000,
+    ress.cookie('vistedd',true,{
+        maxAge:1000,
         
 
     });
@@ -35,10 +35,49 @@ console.log(req.body);
 
 router.get('/:item', function(req,res) {
     console.log(req.cookies);
+  //  console.log(req.headers.cookie);
+   //console.log(res.cookies);
 //console.log(req.params.item);
 const item = req.params.item;
 const arrayItem = ListItems.find((i)=>i.item===item);
 res.send(arrayItem);
 });
+router.use((request,response,next)=>{
+  if(request.session.user){
+    next();
+  }
+  else{
+    response.send(401);
+  }
+  });
+
+router.get('/shopping/cart', (request, response) => {
+    const { cart } = request.session;
+    console.log('Cart');
+    if (!cart) {
+      response.send('You have no cart session');
+    } else {
+      response.send(cart);
+    }
+  });
+
+  router.post('/shopping/cart/item', (request, response) => {
+  const { item, count } = request.body;
+  const cartItem = { item, count };
+  const { cart } = request.session;
+  if (cart) {
+    request.session.cart.items.push(cartItem);
+
+    console.log('exicted cart');
+  } else {
+    console.log('new cart');
+
+    request.session.cart = {
+      items: [cartItem],
+    };
+  }
+  response.send(201);
+});
+  
 
 module.exports = router;
